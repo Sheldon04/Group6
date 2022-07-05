@@ -1,0 +1,5 @@
+('/opt/anaconda3/envs/deeplearning/lib/python3.7/site-packages/dlib-19.22.99-py3.7-macosx-10.9-x86_64.egg',
+ None,
+ {'*.abi3.so', '*.so', '*.cpython-37m-darwin.so', '*.py', 'EGG-INFO', '*.pyc'},
+ 'DATA',
+ [])
