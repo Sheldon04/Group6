@@ -7,7 +7,6 @@ import random
 import time
 
 import arrow
-import cv2
 from django.contrib import auth
 from django.core import serializers
 from django.core.mail import send_mail
@@ -24,13 +23,11 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from datamodel import models
 from datamodel.models import invationRecord, WhiteList, mypicture, mytask, segmentation
 from djangoProject import settings
-from monitor.motion_detect_MOG2 import Detector
+
 from django.views.decorators.http import require_http_methods
 
-from monitor.motion_detect_rtmp import Detector_RTMP
-from monitor.my_thread import Invasion_Record_Saver
-import torch
-import face_recognition
+
+
 
 # _model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 
@@ -153,35 +150,35 @@ def user_update(request):
 
     return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
 
-def gen(d):
-    while True:
-        for frame in d.run2():
-            time.sleep(.001)
-            cv2.imwrite('./1.jpg', frame)
-            flag, buffer = cv2.imencode('.jpg', frame)
-            # if is_invade == True:
-            #     t = Invasion_Record_Saver(_date, _time, num)
-            #     t.start()
-            #     print('invade')
-            yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n\r\n')
-
-#处理过后视频推流
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-@authentication_classes(())
-def send_video(request):
-    d = Detector_RTMP(3, model=_model, known_face_encodings=known_face_encodings, admin_levels_names=admin_levels_names)
-    return StreamingHttpResponse(gen(d), content_type="multipart/x-mixed-replace; boundary=frame")
-
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-@authentication_classes(())
-def start_detector(request):
-    print('start detector')
-    d = Detector(3, model=_model, known_face_encodings=known_face_encodings, admin_levels_names=admin_levels_names)
-    d.run2()
-    return HttpResponse('ok')
-
+# def gen(d):
+#     while True:
+#         for frame in d.run2():
+#             time.sleep(.001)
+#             cv2.imwrite('./1.jpg', frame)
+#             flag, buffer = cv2.imencode('.jpg', frame)
+#             # if is_invade == True:
+#             #     t = Invasion_Record_Saver(_date, _time, num)
+#             #     t.start()
+#             #     print('invade')
+#             yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n\r\n')
+#
+# #处理过后视频推流
+# @api_view(['GET'])
+# @permission_classes((AllowAny,))
+# @authentication_classes(())
+# def send_video(request):
+#     d = Detector_RTMP(3, model=_model, known_face_encodings=known_face_encodings, admin_levels_names=admin_levels_names)
+#     return StreamingHttpResponse(gen(d), content_type="multipart/x-mixed-replace; boundary=frame")
+#
+# @api_view(['GET'])
+# @permission_classes((AllowAny,))
+# @authentication_classes(())
+# def start_detector(request):
+#     print('start detector')
+#     d = Detector(3, model=_model, known_face_encodings=known_face_encodings, admin_levels_names=admin_levels_names)
+#     d.run2()
+#     return HttpResponse('ok')
+#
 def file_iterator(file_name, chunk_size=8192, offset=0, length=None):
     camera = cv2.VideoCapture(file_name)
     if camera.isOpened():
@@ -726,6 +723,7 @@ def record_emo(request):
 # 上报交互事件
 @api_view(['POST'])
 @permission_classes((AllowAny,))
+@authentication_classes(())
 def record_interaction(request):
 
     cid = request.POST.get('cid') # camera id

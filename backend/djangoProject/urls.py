@@ -21,8 +21,8 @@ from djangoProject import view, settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/start', view.start_detector), #视频监控地址
-    path('api/video', view.send_video), #视频监控地址
+    # path('api/start', view.start_detector), #视频监控地址
+    # path('api/video', view.send_video), #视频监控地址
     path('api/user/login', view.login), #登陆
     path('api/admin/getall', view.get_all_users), #获取所有用户信息
     path('api/admin/getuserbyname', view.get_user_by_username), #获取指定用户信息
