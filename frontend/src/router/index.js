@@ -16,6 +16,12 @@ import WhiteList from '../components/admin/settings/WhiteList'
 import Deblur from '../components/user/Deblur'
 import AboutUs from '../components/AboutUs'
 import Contact from '../components/Contact'
+import FallListAdmin from '../components/admin/detection/FallListAdmin'
+import EmoListAdmin from '../components/admin/detection/EmoListAdmin'
+import InteractionListAdmin from '../components/admin/detection/InteractionListAdmin'
+import UnkownListAdmin from '../components/admin/detection/UnkownListAdmin'
+import VolunteerManage from '../components/admin/manage/VolunteerManage'
+import OlderManage from '../components/admin/manage/OlderManage'
 
 Vue.use(Router)
 
@@ -72,9 +78,19 @@ var router = new Router({
       component: FaceRegistration
     },
     {
-      path: '/admin/usermanage',
+      path: '/admin/stuffmanage',
       name: 'StuffManage',
       component: StuffManage
+    },
+    {
+      path: '/admin/volunteermanage',
+      name: 'VolunteerManage',
+      component: VolunteerManage
+    },
+    {
+      path: '/admin/oldermanage',
+      name: 'OlderManage',
+      component: OlderManage
     },
     {
       path: '/admin/whitelist',
@@ -85,6 +101,26 @@ var router = new Router({
       path: '/admin/segmentation',
       name: 'Segmentation',
       component: Segmentation
+    },
+    {
+      path: '/admin/falllist',
+      name: 'FallListAdmin',
+      component: FallListAdmin
+    },
+    {
+      path: '/admin/emolist',
+      name: 'EmoListAdmin',
+      component: EmoListAdmin
+    },
+    {
+      path: '/admin/interactionlist',
+      name: 'InteractionListAdmin',
+      component: InteractionListAdmin
+    },
+    {
+      path: '/admin/unkownlist',
+      name: 'UnkownListAdmin',
+      component: UnkownListAdmin
     },
     {
       path: '/user/deblur',

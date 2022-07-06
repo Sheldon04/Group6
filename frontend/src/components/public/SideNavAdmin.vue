@@ -6,7 +6,7 @@
     <el-submenu index="1">
       <template slot="title">
         <i class="el-icon-view"></i>
-        <span>入侵检测</span>
+        <span>智能监控</span>
       </template>
       <el-menu-item index="/admin/monitor">
         <i class="el-icon-camera"></i>
@@ -14,39 +14,55 @@
       </el-menu-item>
       <el-menu-item index="/admin/traceback">
         <i class="el-icon-refresh"></i>
-        入侵回放
+        监控回放
+      </el-menu-item>
+      <el-menu-item index="/admin/falllist">
+        <i class="el-icon-document"></i>
+        摔倒记录
+      </el-menu-item>
+      <el-menu-item index="/admin/emolist">
+        <i class="el-icon-document"></i>
+        情绪记录
+      </el-menu-item>
+      <el-menu-item index="/admin/interactionlist">
+        <i class="el-icon-document"></i>
+        互动记录
       </el-menu-item>
       <el-menu-item index="/admin/attacklist">
         <i class="el-icon-document"></i>
-        查看记录
+        闯入记录
       </el-menu-item>
-      <el-menu-item index="/admin/attackinfo">
-        <i class="el-icon-setting"></i>
-        入侵统计
+      <el-menu-item index="/admin/unkownlist">
+        <i class="el-icon-document"></i>
+        陌生人记录
       </el-menu-item>
     </el-submenu>
     <el-submenu index="2">
       <template slot="title">
         <i class="el-icon-user"></i>
-        <span>用户管理</span>
+        <span>信息管理</span>
       </template>
-      <el-menu-item index="/admin/facereg">
-        <i class="el-icon-camera"></i>
-        人脸识别注册
-      </el-menu-item>
-      <el-menu-item index="/admin/usermanage">
+      <el-menu-item index="/admin/stuffmanage">
         <i class="el-icon-document"></i>
-        用户信息管理
+        工作人员管理
+      </el-menu-item>
+      <el-menu-item index="/admin/volunteermanage">
+        <i class="el-icon-document"></i>
+        义工管理
+      </el-menu-item>
+      <el-menu-item index="/admin/oldermanage">
+        <i class="el-icon-document"></i>
+        老人管理
       </el-menu-item>
     </el-submenu>
     <el-submenu index="3">
       <template slot="title">
         <i class="el-icon-setting"></i>
-        <span>监控设置</span>
+        <span>监控管理</span>
       </template>
-      <el-menu-item index="/admin/whitelist">
+      <el-menu-item index="/admin/monitorinfo">
         <i class="el-icon-document-checked"></i>
-        可信名单管理
+        监控信息
       </el-menu-item>
       <el-menu-item index="/admin/segmentation">
         <i class="el-icon-crop"></i>

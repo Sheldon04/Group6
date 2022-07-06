@@ -48,16 +48,16 @@
             </td>
           </tr>
           <br>
-          <tr>
-            <td colspan="2" id="choose">
-              <el-checkbox-group
-                v-model="checkedRoles"
-                :min="0"
-                :max="1">
-                <el-checkbox v-for="role in roles" :label="role" :key="role" style="margin: 3px 40px 5px 40px;color: white">{{ role }}</el-checkbox>
-              </el-checkbox-group>
-            </td>
-          </tr>
+<!--          <tr>-->
+<!--            <td colspan="2" id="choose">-->
+<!--              <el-checkbox-group-->
+<!--                v-model="checkedRoles"-->
+<!--                :min="0"-->
+<!--                :max="1">-->
+<!--                <el-checkbox v-for="role in roles" :label="role" :key="role" style="margin: 3px 40px 5px 40px;color: white">{{ role }}</el-checkbox>-->
+<!--              </el-checkbox-group>-->
+<!--            </td>-->
+<!--          </tr>-->
           <tr>
             <!-- 占两行-->
             <td colspan="2">
@@ -164,7 +164,6 @@ h1 {
 .clearfix {
   font-size: larger;
   font-weight: bold;
-  font: ;
   height: 20px;
 }
 
@@ -342,13 +341,14 @@ export default {
       window.open(href, '_blank')
     },
     async submitForm () {
-      if (this.checkedRoles.length !== 0 && this.checkedRoles[0] === '用户') {
-        this.user.is_superuser = '0'
-        console.log('????????????!!!!!!!!!!')
-      } else {
-        this.user.is_superuser = '1'
-        console.log('----------------------')
-      }
+      // if (this.checkedRoles.length !== 0 && this.checkedRoles[0] === '用户') {
+      //   this.user.is_superuser = '0'
+      //   console.log('????????????!!!!!!!!!!')
+      // } else {
+      //   this.user.is_superuser = '1'
+      //   console.log('----------------------')
+      // }
+      this.user.is_superuser = '1'
       axios.post('http://127.0.0.1:8000/api/user/login', this.user).then(response => {
         const {result, detail, errorInfo} = response.data
         if (result === true) {

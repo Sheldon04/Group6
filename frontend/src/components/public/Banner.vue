@@ -5,9 +5,9 @@
     <span style="--i:3">T</span>
     <span style="--i:4">C</span>
     <span style="--i:5">H</span>
-    <span style="--i:6">D</span>
-    <span style="--i:7">o</span>
-    <span style="--i:8">g</span>
+    <span style="--i:6">O</span>
+    <span style="--i:7">l</span>
+    <span style="--i:8">d</span>
     <span style="--i:9">s</span>
   </div>
 </template>
