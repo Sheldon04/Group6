@@ -185,7 +185,7 @@ EMAIL_PORT = 25
 
 EMAIL_HOST_USER = '19301099@bjtu.edu.cn' # 帐号
 
-EMAIL_HOST_PASSWORD = '48766566'  # 授权码（****）
+EMAIL_HOST_PASSWORD = 'Sheldon1204#'  # 授权码（****）
 
 # 默认邮件
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

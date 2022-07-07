@@ -24,44 +24,46 @@
               sortable>
             </el-table-column>
             <el-table-column
-              prop="username"
+              prop="name"
               label="姓名"
               width="150"
               align="center"
               sortable>
             </el-table-column>
             <el-table-column
-              prop="first_name"
-              label="名字"
+              prop="gender"
+              label="性别"
               width="100"
               align="center"
               sortable>
             </el-table-column>
             <el-table-column
-              prop="last_name"
-              label="姓氏"
+              prop="age"
+              label="年龄"
               width="100"
               align="center"
               sortable>
             </el-table-column>
             <el-table-column
-              prop="email"
-              label="邮箱"
-              align="center"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              :formatter = "formatter"
-              prop="is_superuser"
-              label="是否为管理员"
-              align="center"
+              prop="face_info"
+              label="人脸信息"
               width="120"
-              :filters="[{ text: '是', value: '是' }, { text: '否', value: '否' }]"
-              :filter-method="filterHandler">
+              align="center">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" inline @click="handleFace(scope.$index, scope.row)">查看</el-button>
+                <el-button type="text" size="small" inline @click="handleFaceUploadOpen(scope.$index, scope.row)">更新</el-button>
+              </template>
             </el-table-column>
             <el-table-column
-              prop="last_login"
-              label="最近一次登录"
+              prop="phone"
+              label="手机号"
+              align="center"
+              width="200"
+              sortable>
+            </el-table-column>
+            <el-table-column
+              prop="regdate"
+              label="注册日期"
               align="center"
               width="200"
               sortable>
@@ -84,7 +86,7 @@
               <template slot-scope="scope">
                 <el-button
                   size="mini"
-                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                  @click="handleEdit(scope.$index, scope.row)">更多</el-button>
                 <el-button
                   size="mini"
                   type="danger"
@@ -110,17 +112,20 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="editForm.id" auto-complete="off" disabled="true"></el-input>
           </el-form-item>
-          <el-form-item label="昵称" prop="name">
-            <el-input v-model="editForm.username" auto-complete="off"></el-input>
+          <el-form-item label="姓名" prop="name">
+            <el-input v-model="editForm.name" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="名字" prop="first_name">
-            <el-input v-model="editForm.first_name" auto-complete="off"></el-input>
+          <el-form-item label="性别" prop="first_name">
+            <el-input v-model="editForm.gender" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="姓氏" prop="last_name">
-            <el-input v-model="editForm.last_name" auto-complete="off"></el-input>
+          <el-form-item label="年龄" prop="last_name">
+            <el-input v-model="editForm.age" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="editForm.email" auto-complete="off"></el-input>
+          <el-form-item label="手机号" prop="email">
+            <el-input v-model="editForm.phone" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="身份证号" prop="email">
+            <el-input v-model="editForm.idcard" auto-complete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -138,6 +143,18 @@
         <el-button @click="confirmDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleDeleteConfirm">确 定</el-button>
         </span>
+      </el-dialog>
+      <el-dialog
+        @close="faceClose"
+        title="人脸照片"
+        :visible.sync="seeDialogVisible"
+        width="25%"
+        center>
+        <el-image
+          style="width: 300px; height: 300px"
+          :src="licenseImageUrl"
+          :fit="fit"
+          v-loading="faceLoading"></el-image>
       </el-dialog>
     </div>
   </div>
@@ -159,7 +176,7 @@ export default {
     }
   },
   mounted () {
-    const url = 'http://127.0.0.1:8000/api/admin/getall'
+    const url = 'http://127.0.0.1:8000/api/admin/getallv'
     const auth = 'Token ' + localStorage.getItem('token')
     const header = {'Authorization': auth}
     axios.get(url, {'headers': header}).then(response => {
@@ -180,12 +197,48 @@ export default {
       editForm: {},
       editFormVisible: false,
       id_to_delete: '',
-      editURL: this.localAPI + 'admin/edituser',
-      delURL: this.localAPI + 'admin/deluser',
-      confirmDialogVisible: false
+      editURL: this.localAPI + 'admin/editv',
+      delURL: this.localAPI + 'admin/delv',
+      faceURL: this.localAPI + 'admin/getface',
+      confirmDialogVisible: false,
+      faceLoading: false,
+      seeDialogVisible: false,
+      editFormVisible_face: true,
+      licenseImageUrl: '',
+      newLicenseImageUrl: ''
     }
   },
   methods: {
+    faceClose () {
+      this.seeDialogVisible = false
+      this.licenseImageUrl = ''
+    },
+    faceUploadClose () {
+      this.editFormVisible_face = false
+      this.file = ''
+      this.newLicenseImageUrl = ''
+    },
+    handleFace (index, row) {
+      this.faceLoading = true
+      this.seeDialogVisible = true
+      let formData = new FormData()
+      formData.append('idcard', row.idcard)
+      console.log(formData.get('idcard'))
+      axios.post(this.faceURL, formData, {'headers': this.headers}).then(res => {
+        this.$message.success('获取成功')
+        this.licenseImageUrl = this.localMedia + res.data
+        this.faceLoading = false
+        console.log(this.licenseImageUrl)
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+        this.$message.error('获取失败')
+      })
+    },
+    handleFaceUploadOpen (index, row) {
+      this.editFormVisible_face = true
+      // this.editPhone = row.phone_number
+      // this.editName = row.name
+    },
     // 点击编辑
     handleEdit (index, row) {
       this.editFormVisible = true
@@ -210,10 +263,12 @@ export default {
       // 这里再向后台发个post请求重新渲染表格数据
       let formData = new FormData()
       formData.append('id', this.editForm.id)
-      formData.append('username', this.editForm.username)
-      formData.append('email', this.editForm.email)
-      formData.append('first_name', this.editForm.first_name)
-      formData.append('last_name', this.editForm.last_name)
+      formData.append('name', this.editForm.name)
+      formData.append('phone', this.editForm.phone)
+      formData.append('age', this.editForm.age)
+      formData.append('idcard', this.editForm.idcard)
+      formData.append('gender', this.editForm.gender)
+      formData.append('regdate', this.editForm.regdate)
       axios.post(this.editURL, formData, {'headers': this.headers}).then(res => {
         const {result, errorInfo} = res.data
         if (result === true) {
@@ -223,7 +278,7 @@ export default {
             type: 'success'
           })
           this.loading = true
-          axios.get('http://127.0.0.1:8000/api/admin/getall', {'headers': this.headers}).then(response => {
+          axios.get('http://127.0.0.1:8000/api/admin/getallv', {'headers': this.headers}).then(response => {
             this.tableData = response.data
             this.loading = false
           })
@@ -255,7 +310,7 @@ export default {
             type: 'success'
           })
           this.loading = true
-          axios.get('http://127.0.0.1:8000/api/admin/getall', {'headers': this.headers}).then(response => {
+          axios.get('http://127.0.0.1:8000/api/admin/getallv', {'headers': this.headers}).then(response => {
             this.tableData = response.data
             this.loading = false
           })

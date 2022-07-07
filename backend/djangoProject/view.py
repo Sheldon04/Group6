@@ -21,7 +21,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
 from datamodel import models
-from datamodel.models import invationRecord, WhiteList, mypicture, mytask, segmentation
+from datamodel.models import invationRecord, WhiteList, mypicture, mytask, segmentation, FallEvent, EmoEvent, \
+    InteractionEvent, UnkownEvent, AttackEvent, Older, FaceLib, Volunteer, Stuff
 from djangoProject import settings
 
 from django.views.decorators.http import require_http_methods
@@ -207,54 +208,55 @@ def get_video(request):
 
 #人脸接受保存
 @api_view(['POST'])
-#@permission_classes((AllowAny,))
+@permission_classes((AllowAny,))
+@authentication_classes(())
 def upload_face(request):
-    img = request.FILES.get('face')
-    phone = request.POST.get('phone')
+    img = request.FILES.get('img')
+    idcard = request.POST.get('idcard')
     #phone = '222'
-    print(phone)
     print(img)
-    img_model = models.mypicture(
-        photo=img,  # 拿到图片路径
-        phone=phone # 拿到图片对应手机号
+    print(idcard)
+    face_model = models.FaceLib(
+        img=img,  # 拿到图片路径
+        idcard=idcard # 拿到图片对应手机号
     )
-    img_model.save()  # 保存图片
-    print(img_model.photo.name)
-    return HttpResponse('media/' + img_model.photo.name)
+    face_model.save()  # 保存图片
+    print(face_model.img.name)
+    return HttpResponse('media/' + face_model.img.name)
 
 @api_view(['POST'])
 #@permission_classes((AllowAny,))
 def get_face(request):
-    phone = request.POST.get('phone_number')
+    idcard = request.POST.get('idcard')
     #phone = '222'
-    print(phone)
-    qset = mypicture.objects.filter(phone=phone)
+    print(idcard)
+    qset = FaceLib.objects.filter(idcard=idcard)
     print(qset.count())
     mypic = qset.first()
-    return HttpResponse('media/' + mypic.photo.name)
+    return HttpResponse('media/' + mypic.img.name)
 
 @api_view(['POST'])
 #@permission_classes((AllowAny,))
 def update_face(request):
     del_path = ''
-    phone = request.POST.get('phone_number')
-    img = request.FILES.get('face')
+    img = request.FILES.get('img')
+    idcard = request.POST.get('idcard')
     #phone = '222'
-    print(phone)
+    print(idcard)
     try:
-        old = mypicture.objects.filter(phone=phone).first()
+        old = FaceLib.objects.filter(img=img).first()
         del_path = './media/' + old.photo.name
         os.remove(del_path)
     except:
         print('delete failed')
     print(del_path)
-    mypicture.objects.filter(phone=phone).delete()
-    img_model = models.mypicture(
-        photo=img,  # 拿到图片路径
-        phone=phone # 拿到图片对应手机号
+    FaceLib.objects.filter(idcard=idcard).delete()
+    face_model = models.FaceLib(
+        img=img,  # 拿到图片路径
+        idcard=idcard # 拿到图片对应手机号
     )
-    img_model.save()  # 保存图片
-    return HttpResponse('media/' + img_model.photo.name)
+    face_model.save()  # 保存图片
+    return HttpResponse('media/' + face_model.img.name)
 
 @api_view(['POST'])
 #获取某一天某段时间内的入侵记录
@@ -546,9 +548,10 @@ def send_my_email(request):
     # 发送邮件
     try:
         send_mail(title, msg, email_from, reciever)
-    except:
+    except Exception as e:
         result = False
         error_info = '验证码发送失败'
+        print(e)
     return JsonResponse({'result': result, 'detail': detail, 'errorInfo': error_info})
 
 @api_view(['POST'])
@@ -662,13 +665,12 @@ def task_get_photos(request):
 
 
 
-
-
 # 上报摔倒事件
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes(())
 def record_fall(request):
+    img = request.FILES.get('img')
     cid = request.POST.get('cid') # camera id
     now = datetime.datetime.now()
     date = now.strftime("%Y-%m-%d")
@@ -681,9 +683,76 @@ def record_fall(request):
         date=date,
         time=time,
         detail=detail,
+        img=img
     )
     try:
         fall_model.save()
+    except Exception as e:
+        print(e)
+        result = 0
+
+    return JsonResponse({'result': result})
+
+# 上报闯入事件
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+@authentication_classes(())
+def record_attack(request):
+    img = request.FILES.get('img')
+    cid = request.POST.get('cid') # camera id
+    now = datetime.datetime.now()
+    date = now.strftime("%Y-%m-%d")
+    time = now.strftime("%H:%M:%S")
+    detail = request.POST.get('detail')
+    personType = request.POST.get('personType')
+    area = request.POST.get('area')
+    personId = request.POST.get('personId')
+
+    result = 1
+    attack_model = models.AttackEvent(
+        cid=cid,
+        date=date,
+        time=time,
+        detail=detail,
+        img=img,
+        personId=personId,
+        personType=personType,
+        area=area
+    )
+    try:
+        attack_model.save()
+    except Exception as e:
+        print(e)
+        result = 0
+
+    return JsonResponse({'result': result})
+
+
+
+# 上报陌生人事件
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+@authentication_classes(())
+def record_unkown(request):
+    img = request.FILES.get('img')
+    cid = request.POST.get('cid') # camera id
+    now = datetime.datetime.now()
+    date = now.strftime("%Y-%m-%d")
+    time = now.strftime("%H:%M:%S")
+    detail = request.POST.get('detail')
+    num = request.POST.get('num')
+
+    result = 1
+    unkown_model = models.UnkownEvent(
+        cid=cid,
+        date=date,
+        time=time,
+        detail=detail,
+        img=img,
+        num=num
+    )
+    try:
+        unkown_model.save()
     except Exception as e:
         print(e)
         result = 0
@@ -696,8 +765,10 @@ def record_fall(request):
 @permission_classes((AllowAny,))
 @authentication_classes(())
 def record_emo(request):
+    img = request.FILES.get('img')
     cid = request.POST.get('cid') # camera id
     oid = request.POST.get('oid')
+    emo = request.POST.get('emo')
     now = datetime.datetime.now()
     date = now.strftime("%Y-%m-%d")
     time = now.strftime("%H:%M:%S")
@@ -710,6 +781,8 @@ def record_emo(request):
         date=date,
         time=time,
         detail=detail,
+        emo=emo,
+        img=img
     )
     try:
         emo_model.save()
@@ -725,7 +798,7 @@ def record_emo(request):
 @permission_classes((AllowAny,))
 @authentication_classes(())
 def record_interaction(request):
-
+    img = request.FILES.get('img')
     cid = request.POST.get('cid') # camera id
     oid = request.POST.get('oid')
     vid = request.POST.get('vid')
@@ -742,6 +815,7 @@ def record_interaction(request):
         date=date,
         time=time,
         detail=detail,
+        img=img
     )
     try:
         interaction_model.save()
@@ -752,3 +826,625 @@ def record_interaction(request):
     return JsonResponse({'result': result})
 
 
+
+@api_view(['POST'])
+#获取某一天某段时间内的摔倒记录
+def get_specific_fall_records(request):
+    date_choose_str= request.POST.get('date')
+    time_span_str=request.POST.get('time_span')
+
+    date_choose =datetime.datetime.strptime(date_choose_str,"%Y-%m-%d")
+    time_str_list=time_span_str.split(',')
+    time_from_str=time_str_list[0]
+    time_to_str=time_str_list[1]
+    time_from=datetime.datetime.strptime(time_from_str,'%H:%M:%S')
+    time_to = datetime.datetime.strptime(time_to_str, '%H:%M:%S')
+
+
+    list1 = FallEvent.objects.filter(date__range=(date_choose, date_choose))
+    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail")
+
+    response_data =json.dumps(
+        list(list.values("date", "time", "cid", "detail")), cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['GET'])
+#获得全部摔倒记录
+def get_fall_records(request):
+
+    recordList = FallEvent.objects.values("date", "time", "cid", "detail")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail")), cls=DateEncoder)
+
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['POST'])
+def get_fall_detail(request):
+    date = request.POST.get("date")
+    time = request.POST.get("time")
+    time = time.split(':')
+    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
+    dirname = './media/screen_shots/' + datetime
+    print('dirname ', dirname)
+    # dirname = './monitor/video/2021-07-27-10-23-08'
+    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    filename_list = []
+    for i in range(0, file_num):
+        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
+    print(filename_list)
+    return Response(filename_list)
+
+
+@api_view(['POST'])
+#获取某一天某段时间内的情绪记录
+def get_specific_emo_records(request):
+    date_choose_str= request.POST.get('date')
+    time_span_str=request.POST.get('time_span')
+
+    date_choose =datetime.datetime.strptime(date_choose_str,"%Y-%m-%d")
+    time_str_list=time_span_str.split(',')
+    time_from_str=time_str_list[0]
+    time_to_str=time_str_list[1]
+    time_from=datetime.datetime.strptime(time_from_str,'%H:%M:%S')
+    time_to = datetime.datetime.strptime(time_to_str, '%H:%M:%S')
+
+
+    list1 = EmoEvent.objects.filter(date__range=(date_choose, date_choose))
+    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","oid","emo")
+
+    response_data =json.dumps(
+        list(list.values("date", "time", "cid", "detail","oid","emo")), cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['GET'])
+#获得全部情绪记录
+def get_emo_records(request):
+
+    recordList = EmoEvent.objects.values("date", "time", "cid", "detail","oid","emo")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","oid","emo")), cls=DateEncoder)
+
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['POST'])
+def get_emo_detail(request):
+    date = request.POST.get("date")
+    time = request.POST.get("time")
+    time = time.split(':')
+    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
+    dirname = './media/screen_shots/' + datetime
+    print('dirname ', dirname)
+    # dirname = './monitor/video/2021-07-27-10-23-08'
+    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    filename_list = []
+    for i in range(0, file_num):
+        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
+    print(filename_list)
+    return Response(filename_list)
+
+
+@api_view(['POST'])
+#获取某一天某段时间内的情绪记录
+def get_specific_interaction_records(request):
+    date_choose_str= request.POST.get('date')
+    time_span_str=request.POST.get('time_span')
+
+    date_choose =datetime.datetime.strptime(date_choose_str,"%Y-%m-%d")
+    time_str_list=time_span_str.split(',')
+    time_from_str=time_str_list[0]
+    time_to_str=time_str_list[1]
+    time_from=datetime.datetime.strptime(time_from_str,'%H:%M:%S')
+    time_to = datetime.datetime.strptime(time_to_str, '%H:%M:%S')
+
+
+    list1 = InteractionEvent.objects.filter(date__range=(date_choose, date_choose))
+    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","oid","vid")
+
+    response_data =json.dumps(
+        list(list.values("date", "time", "cid", "detail","oid","vid")), cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['GET'])
+#获得全部情绪记录
+def get_interaction_records(request):
+
+    recordList = InteractionEvent.objects.values("date", "time", "cid", "detail","oid","vid")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","oid","vid")), cls=DateEncoder)
+
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['POST'])
+def get_interaction_detail(request):
+    date = request.POST.get("date")
+    time = request.POST.get("time")
+    time = time.split(':')
+    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
+    dirname = './media/screen_shots/' + datetime
+    print('dirname ', dirname)
+    # dirname = './monitor/video/2021-07-27-10-23-08'
+    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    filename_list = []
+    for i in range(0, file_num):
+        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
+    print(filename_list)
+    return Response(filename_list)
+
+
+@api_view(['POST'])
+#获取某一天某段时间内的摔倒记录
+def get_specific_unkown_records(request):
+    date_choose_str= request.POST.get('date')
+    time_span_str=request.POST.get('time_span')
+
+    date_choose =datetime.datetime.strptime(date_choose_str,"%Y-%m-%d")
+    time_str_list=time_span_str.split(',')
+    time_from_str=time_str_list[0]
+    time_to_str=time_str_list[1]
+    time_from=datetime.datetime.strptime(time_from_str,'%H:%M:%S')
+    time_to = datetime.datetime.strptime(time_to_str, '%H:%M:%S')
+
+
+    list1 = UnkownEvent.objects.filter(date__range=(date_choose, date_choose))
+    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","num")
+
+    response_data =json.dumps(
+        list(list.values("date", "time", "cid", "detail","num")), cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['GET'])
+#获得全部陌生人记录
+def get_unkown_records(request):
+
+    recordList = UnkownEvent.objects.values("date", "time", "cid", "detail","num")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","num")), cls=DateEncoder)
+
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['POST'])
+def get_unkown_detail(request):
+    date = request.POST.get("date")
+    time = request.POST.get("time")
+    time = time.split(':')
+    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
+    dirname = './media/screen_shots/' + datetime
+    print('dirname ', dirname)
+    # dirname = './monitor/video/2021-07-27-10-23-08'
+    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    filename_list = []
+    for i in range(0, file_num):
+        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
+    print(filename_list)
+    return Response(filename_list)
+
+
+@api_view(['POST'])
+#获取某一天某段时间内的闯入记录
+def get_specific_attack_records(request):
+    date_choose_str= request.POST.get('date')
+    time_span_str=request.POST.get('time_span')
+
+    date_choose =datetime.datetime.strptime(date_choose_str,"%Y-%m-%d")
+    time_str_list=time_span_str.split(',')
+    time_from_str=time_str_list[0]
+    time_to_str=time_str_list[1]
+    time_from=datetime.datetime.strptime(time_from_str,'%H:%M:%S')
+    time_to = datetime.datetime.strptime(time_to_str, '%H:%M:%S')
+
+
+    list1 = AttackEvent.objects.filter(date__range=(date_choose, date_choose))
+    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","personId","personType","area")
+
+    response_data =json.dumps(
+        list(list.values("date", "time", "cid", "detail","personId","personType","area")), cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['GET'])
+#获得全部闯入记录
+def get_attack_records(request):
+
+    recordList = AttackEvent.objects.values("date", "time", "cid", "detail","area","personId","personType","area")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","personId","personType","area")), cls=DateEncoder)
+
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['POST'])
+def get_attack_detail(request):
+    date = request.POST.get("date")
+    time = request.POST.get("time")
+    time = time.split(':')
+    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
+    dirname = './media/screen_shots/' + datetime
+    print('dirname ', dirname)
+    # dirname = './monitor/video/2021-07-27-10-23-08'
+    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    filename_list = []
+    for i in range(0, file_num):
+        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
+    print(filename_list)
+    return Response(filename_list)
+
+
+
+#增加用户
+@api_view(['POST'])
+def o_reg(request):
+    result = True
+    detail = {}
+    error_info = ''
+    name = request.POST.get("name")
+    phone = request.POST.get("phone")
+    age = request.POST.get("age")
+    idcard = request.POST.get("idcard")
+    gender = request.POST.get("gender")
+    regdate = request.POST.get("regdate")
+    r1name = request.POST.get("r1name")
+    r1phone = request.POST.get("r1phone")
+    r2name = request.POST.get("r2name")
+    r2phone = request.POST.get("r2phone")
+    health = request.POST.get("health")
+    room = request.POST.get("room")
+    try:
+        older = models.Older(
+            name = name,
+            phone = phone,
+            age = age,
+            idcard = idcard,
+            gender = gender,
+            regdate = regdate,
+            r1name = r1name,
+            r1phone = r1phone,
+            r2name = r2name,
+            r2phone = r2phone,
+            health = health,
+            room = room
+        )
+        older.save()
+        result = True
+    except Exception as e:
+        result = False
+        print(e)
+        error_info = '用户已存在'
+
+    return JsonResponse({'result': result, 'detail': detail, 'errorInfo': error_info})
+
+#删除用户
+@api_view(['POST'])
+def o_delete(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    Older.objects.filter(id=id).delete()
+
+    if(Older.objects.filter(id=id).delete()):
+        print("success")
+        result = True
+    else:
+        print('delede failed')
+        result = False
+        error_info = '删除失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#编辑用户
+@api_view(['POST'])
+def o_update(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    name = request.POST.get("name")
+    phone = request.POST.get("phone")
+    age = request.POST.get("age")
+    idcard = request.POST.get("idcard")
+    gender = request.POST.get("gender")
+    regdate = request.POST.get("regdate")
+    r1name = request.POST.get("r1name")
+    r1phone = request.POST.get("r1phone")
+    r2name = request.POST.get("r2name")
+    r2phone = request.POST.get("r2phone")
+    health = request.POST.get("health")
+    room = request.POST.get("room")
+
+    if(Older.objects.filter(id=id).update(name = name,
+                                         phone = phone,
+                                         age = age,
+                                         idcard = idcard,
+                                         gender = gender,
+                                         regdate = regdate,
+                                         r1name = r1name,
+                                         r1phone = r1phone,
+                                         r2name = r2name,
+                                         r2phone = r2phone,
+                                         health = health,
+                                         room = room)):
+        print("success")
+        result = True
+    else:
+        print('edit failed')
+        result = False
+        error_info = '编辑失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#获取所有用户信息
+@api_view(['GET'])
+def get_all_o(request):
+    oList = Older.objects.values("id", "name", "phone", "age", "idcard", "regdate", "r1name", "r1phone", "r2name", "r2phone", "gender", "health", "room")
+    response_data = json.dumps(list(oList.values("id", "name", "phone", "age", "idcard", "regdate", "r1name", "r1phone", "r2name", "r2phone", "gender", "health", "room")),
+                               cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+#增加用户
+@api_view(['POST'])
+def o_reg(request):
+    result = True
+    detail = {}
+    error_info = ''
+    name = request.POST.get("name")
+    phone = request.POST.get("phone")
+    age = request.POST.get("age")
+    idcard = request.POST.get("idcard")
+    gender = request.POST.get("gender")
+    regdate = request.POST.get("regdate")
+    r1name = request.POST.get("r1name")
+    r1phone = request.POST.get("r1phone")
+    r2name = request.POST.get("r2name")
+    r2phone = request.POST.get("r2phone")
+    health = request.POST.get("health")
+    room = request.POST.get("room")
+    try:
+        older = models.Older(
+            name = name,
+            phone = phone,
+            age = age,
+            idcard = idcard,
+            gender = gender,
+            regdate = regdate,
+            r1name = r1name,
+            r1phone = r1phone,
+            r2name = r2name,
+            r2phone = r2phone,
+            health = health,
+            room = room
+        )
+        older.save()
+        result = True
+    except Exception as e:
+        result = False
+        print(e)
+        error_info = '用户已存在'
+
+    return JsonResponse({'result': result, 'detail': detail, 'errorInfo': error_info})
+
+#删除用户
+@api_view(['POST'])
+def o_delete(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    Older.objects.filter(id=id).delete()
+
+    if(Older.objects.filter(id=id).delete()):
+        print("success")
+        result = True
+    else:
+        print('delede failed')
+        result = False
+        error_info = '删除失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#编辑用户
+@api_view(['POST'])
+def o_update(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    name = request.POST.get("name")
+    phone = request.POST.get("phone")
+    age = request.POST.get("age")
+    idcard = request.POST.get("idcard")
+    gender = request.POST.get("gender")
+    regdate = request.POST.get("regdate")
+    r1name = request.POST.get("r1name")
+    r1phone = request.POST.get("r1phone")
+    r2name = request.POST.get("r2name")
+    r2phone = request.POST.get("r2phone")
+    health = request.POST.get("health")
+    room = request.POST.get("room")
+
+    if(Older.objects.filter(id=id).update(name = name,
+                                          phone = phone,
+                                          age = age,
+                                          idcard = idcard,
+                                          gender = gender,
+                                          regdate = regdate,
+                                          r1name = r1name,
+                                          r1phone = r1phone,
+                                          r2name = r2name,
+                                          r2phone = r2phone,
+                                          health = health,
+                                          room = room)):
+        print("success")
+        result = True
+    else:
+        print('edit failed')
+        result = False
+        error_info = '编辑失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#获取所有用户信息
+@api_view(['GET'])
+def get_all_o(request):
+    oList = Older.objects.values("id", "name", "phone", "age", "idcard", "regdate", "r1name", "r1phone", "r2name", "r2phone", "gender", "health", "room")
+    response_data = json.dumps(list(oList.values("id", "name", "phone", "age", "idcard", "regdate", "r1name", "r1phone", "r2name", "r2phone", "gender", "health", "room")),
+                               cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+
+#增加用户
+@api_view(['POST'])
+def s_reg(request):
+    result = True
+    detail = {}
+    error_info = ''
+    name = request.POST.get("name")
+    phone = request.POST.get("phone")
+    age = request.POST.get("age")
+    idcard = request.POST.get("idcard")
+    gender = request.POST.get("gender")
+    regdate = request.POST.get("regdate")
+    try:
+        stuff = models.Stuff(
+            name = name,
+            phone = phone,
+            age = age,
+            idcard = idcard,
+            gender = gender,
+            regdate = regdate
+        )
+        stuff.save()
+        result = True
+    except Exception as e:
+        result = False
+        print(e)
+        error_info = '用户已存在'
+
+    return JsonResponse({'result': result, 'detail': detail, 'errorInfo': error_info})
+
+#删除用户
+@api_view(['POST'])
+def s_delete(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    Stuff.objects.filter(id=id).delete()
+
+    if(Stuff.objects.filter(id=id).delete()):
+        print("success")
+        result = True
+    else:
+        print('delede failed')
+        result = False
+        error_info = '删除失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#编辑用户
+@api_view(['POST'])
+def s_update(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    name = request.POST.get("name")
+    phone = request.POST.get("phone")
+    age = request.POST.get("age")
+    idcard = request.POST.get("idcard")
+    gender = request.POST.get("gender")
+    regdate = request.POST.get("regdate")
+
+    if(Stuff.objects.filter(id=id).update(name = name,
+                                          phone = phone,
+                                          age = age,
+                                          idcard = idcard,
+                                          gender = gender,
+                                          regdate = regdate)):
+        print("success")
+        result = True
+    else:
+        print('edit failed')
+        result = False
+        error_info = '编辑失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#获取所有用户信息
+@api_view(['GET'])
+def get_all_s(request):
+    sList = Stuff.objects.values("id", "name", "phone", "age", "idcard", "regdate")
+    response_data = json.dumps(list(sList.values("id", "name", "phone", "age", "idcard", "regdate")),
+                               cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+
+#增加用户
+@api_view(['POST'])
+def v_reg(request):
+    result = True
+    detail = {}
+    error_info = ''
+    name = request.POST.get("name")
+    phone = request.POST.get("phone")
+    age = request.POST.get("age")
+    idcard = request.POST.get("idcard")
+    gender = request.POST.get("gender")
+    regdate = request.POST.get("regdate")
+    try:
+        vonlunteer = models.Volunteer(
+            name = name,
+            phone = phone,
+            age = age,
+            idcard = idcard,
+            gender = gender,
+            regdate = regdate
+        )
+        vonlunteer.save()
+        result = True
+    except Exception as e:
+        result = False
+        print(e)
+        error_info = '用户已存在'
+
+    return JsonResponse({'result': result, 'detail': detail, 'errorInfo': error_info})
+
+#删除用户
+@api_view(['POST'])
+def v_delete(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    Volunteer.objects.filter(id=id).delete()
+
+    if(Volunteer.objects.filter(id=id).delete()):
+        print("success")
+        result = True
+    else:
+        print('delede failed')
+        result = False
+        error_info = '删除失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#编辑用户
+@api_view(['POST'])
+def v_update(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    name = request.POST.get("name")
+    phone = request.POST.get("phone")
+    age = request.POST.get("age")
+    idcard = request.POST.get("idcard")
+    gender = request.POST.get("gender")
+    regdate = request.POST.get("regdate")
+
+    if(Volunteer.objects.filter(id=id).update(name = name,
+                                              phone = phone,
+                                              age = age,
+                                              idcard = idcard,
+                                              gender = gender,
+                                              regdate = regdate)):
+        print("success")
+        result = True
+    else:
+        print('edit failed')
+        result = False
+        error_info = '编辑失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#获取所有用户信息
+@api_view(['GET'])
+def get_all_v(request):
+    vList = Volunteer.objects.values("id", "name", "phone", "age", "idcard", "regdate")
+    response_data = json.dumps(list(vList.values("id", "name", "phone", "age", "idcard", "regdate")),
+                               cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)

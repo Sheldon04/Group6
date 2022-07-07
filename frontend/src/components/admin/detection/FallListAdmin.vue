@@ -68,14 +68,14 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="level"
-              label="报警级别"
+              prop="cid"
+              label="摄像头编号"
               width="150"
               align="center">
             </el-table-column>
             <el-table-column
-              prop="camera_id"
-              label="摄像头"
+              prop="oid"
+              label="老人编号"
               width="150"
               align="center">
             </el-table-column>
@@ -86,8 +86,8 @@
               align="center">
             </el-table-column>
             <el-table-column
-              prop="invation_num"
-              label="入侵数量"
+              prop="detail"
+              label="摔倒详情"
               width="150"
               align="center">
             </el-table-column>
@@ -112,7 +112,7 @@
       </el-container>
       <el-dialog
         @close="detailClose"
-        title="入侵详情"
+        title="摔倒详情"
         :visible.sync="detailVisible"
         center
         class="detail-dialog">
@@ -166,24 +166,26 @@ export default {
   mounted () {
     const auth = 'Token ' + localStorage.getItem('token')
     const header = {'Authorization': auth}
-    axios.get('http://127.0.0.1:8000/api/attacklistuser/all', {'headers': header}).then(response => {
+    // 接口: http://127.0.0.1:8000/api/fallListAdmin/
+    axios.get('http://127.0.0.1:8000/api/event/fall/all', {'headers': header}).then(response => {
       this.tableData = response.data
       this.loading = false
     })
   },
   methods: {
+    // let keywords = []
+    // keywords.push(this.date)
+    // if (this.timespan.length !== 0) {
+    //   keywords = keywords.concat(this.timespan)
+    // }
     async search () {
-      // let keywords = []
-      // keywords.push(this.date)
-      // if (this.timespan.length !== 0) {
-      //   keywords = keywords.concat(this.timespan)
-      // }
       let formData = new FormData()
-      formData.append('date', this.date) // 2021-7-10
+      formData.append('date', this.date) // 2022-7-6
       formData.append('time_span', this.timespan) // 8:00:15,9:00:00
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
-      axios.post('http://127.0.0.1:8000/api/attacklistuser', formData, {'headers': header}).then(response => {
+      // 接口:http://127.0.0.1:8000/api/fallListAdmin
+      axios.post('http://127.0.0.1:8000/api/event/fall', formData, {'headers': header}).then(response => {
         this.tableData = response.data
       })
       console.log(formData.get('date'))
@@ -215,7 +217,8 @@ export default {
       formData.append('time', time)
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
-      axios.post('http://127.0.0.1:8000/api/attacklistuser/detail', formData, {'headers': header}).then(response => {
+      // 接口：http://127.0.0.1:8000/api/fallListAdmin/detail
+      axios.post('http://127.0.0.1:8000/api/fallListAdmin/detail', formData, {'headers': header}).then(response => {
         console.log(response.data)
         this.imgs = response.data
       })
@@ -233,8 +236,9 @@ export default {
       pageSize: 10, // 每页的数据条数
       imgSrc: require('../../../assets/img3.jpg'),
       options: [],
-      date: '2021-7-21',
+      date: '2022-7-6',
       timespan: ['00:00:00', '23:59:59'],
+      // tableData: 日期，时间，摄像头编号，老人编号，报警区域，摔倒详情。
       tableData: [],
       detailVisible: false,
       imgs: [],

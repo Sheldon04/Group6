@@ -1,4 +1,4 @@
-<template>
+  <template>
   <div>
     <div>
       <el-container>
@@ -45,7 +45,7 @@
           <el-table
             v-loading="loading"
             :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-            style="width: 1200px"
+            style="width: 1400px"
             :row-class-name="tableRowClassName">
             <el-table-column
               prop="date"
@@ -68,31 +68,42 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="level"
-              label="报警级别"
-              width="150"
-              align="center">
-            </el-table-column>
-            <el-table-column
-              prop="camera_id"
+              prop="cid"
               label="摄像头"
-              width="150"
+              width="100"
               align="center">
             </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="level"-->
+<!--              label="报警级别"-->
+<!--              width="150"-->
+<!--              align="center">-->
+<!--            </el-table-column>-->
             <el-table-column
               prop="area"
-              label="报警区域"
+              label="区域"
               width="150"
               align="center">
             </el-table-column>
             <el-table-column
-              prop="invation_num"
-              label="入侵数量"
+              prop="oid"
+              label="老人ID"
+              width="100"
+              align="center">
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="老人姓名"
               width="150"
               align="center">
             </el-table-column>
             <el-table-column
-              fixed="right"
+              prop="emo"
+              label="老人情绪"
+              width="150"
+              align="center">
+            </el-table-column>
+            <el-table-column
               label="操作"
               width="100"
               align="center">
@@ -112,7 +123,7 @@
       </el-container>
       <el-dialog
         @close="detailClose"
-        title="入侵详情"
+        title="老人情绪"
         :visible.sync="detailVisible"
         center
         class="detail-dialog">
@@ -166,7 +177,8 @@ export default {
   mounted () {
     const auth = 'Token ' + localStorage.getItem('token')
     const header = {'Authorization': auth}
-    axios.get('http://127.0.0.1:8000/api/attacklistuser/all', {'headers': header}).then(response => {
+    // http://127.0.0.1:8000/api/emolistuser/all  http://127.0.0.1:8000/api/attacklistuser/all
+    axios.get('http://127.0.0.1:8000/api/event/emo/all', {'headers': header}).then(response => {
       this.tableData = response.data
       this.loading = false
     })
@@ -183,7 +195,8 @@ export default {
       formData.append('time_span', this.timespan) // 8:00:15,9:00:00
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
-      axios.post('http://127.0.0.1:8000/api/attacklistuser', formData, {'headers': header}).then(response => {
+      // http://127.0.0.1:8000/api/emolistuser http://127.0.0.1:8000/api/attacklistuser
+      axios.post('http://127.0.0.1:8000/api/event/emo', formData, {'headers': header}).then(response => {
         this.tableData = response.data
       })
       console.log(formData.get('date'))
@@ -215,7 +228,8 @@ export default {
       formData.append('time', time)
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
-      axios.post('http://127.0.0.1:8000/api/attacklistuser/detail', formData, {'headers': header}).then(response => {
+      // http://127.0.0.1:8000/api/emolistuser/detail http://127.0.0.1:8000/api/attacklistuser/detail
+      axios.post('http://127.0.0.1:8000/api/emolistuser/detail', formData, {'headers': header}).then(response => {
         console.log(response.data)
         this.imgs = response.data
       })

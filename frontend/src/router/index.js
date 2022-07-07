@@ -22,6 +22,7 @@ import InteractionListAdmin from '../components/admin/detection/InteractionListA
 import UnkownListAdmin from '../components/admin/detection/UnkownListAdmin'
 import VolunteerManage from '../components/admin/manage/VolunteerManage'
 import OlderManage from '../components/admin/manage/OlderManage'
+import AddPerson from '../components/admin/manage/AddPerson'
 
 Vue.use(Router)
 
@@ -91,6 +92,11 @@ var router = new Router({
       path: '/admin/oldermanage',
       name: 'OlderManage',
       component: OlderManage
+    },
+    {
+      path: '/admin/addperson',
+      name: 'AddPerson',
+      component: AddPerson
     },
     {
       path: '/admin/whitelist',

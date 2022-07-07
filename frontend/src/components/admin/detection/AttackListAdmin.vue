@@ -68,13 +68,19 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="level"
-              label="报警级别"
+              prop="personType"
+              label="人员类型"
               width="150"
               align="center">
             </el-table-column>
             <el-table-column
-              prop="camera_id"
+              prop="personId"
+              label="人员ID"
+              width="150"
+              align="center">
+            </el-table-column>
+            <el-table-column
+              prop="cid"
               label="摄像头"
               width="150"
               align="center">
@@ -82,12 +88,6 @@
             <el-table-column
               prop="area"
               label="报警区域"
-              width="150"
-              align="center">
-            </el-table-column>
-            <el-table-column
-              prop="invation_num"
-              label="入侵数量"
               width="150"
               align="center">
             </el-table-column>
@@ -166,7 +166,7 @@ export default {
   mounted () {
     const auth = 'Token ' + localStorage.getItem('token')
     const header = {'Authorization': auth}
-    axios.get('http://127.0.0.1:8000/api/attacklistuser/all', {'headers': header}).then(response => {
+    axios.get('http://127.0.0.1:8000/api/event/attack/all', {'headers': header}).then(response => {
       this.tableData = response.data
       this.loading = false
     })
@@ -183,7 +183,7 @@ export default {
       formData.append('time_span', this.timespan) // 8:00:15,9:00:00
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
-      axios.post('http://127.0.0.1:8000/api/attacklistuser', formData, {'headers': header}).then(response => {
+      axios.post('http://127.0.0.1:8000/api/event/attack', formData, {'headers': header}).then(response => {
         this.tableData = response.data
       })
       console.log(formData.get('date'))

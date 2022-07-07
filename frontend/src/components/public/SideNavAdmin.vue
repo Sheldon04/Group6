@@ -42,17 +42,21 @@
         <i class="el-icon-user"></i>
         <span>信息管理</span>
       </template>
+      <el-menu-item index="/admin/addperson">
+        <i class="el-icon-document"></i>
+        添加人员
+      </el-menu-item>
       <el-menu-item index="/admin/stuffmanage">
         <i class="el-icon-document"></i>
-        工作人员管理
+        工作人员列表
       </el-menu-item>
       <el-menu-item index="/admin/volunteermanage">
         <i class="el-icon-document"></i>
-        义工管理
+        义工列表
       </el-menu-item>
       <el-menu-item index="/admin/oldermanage">
         <i class="el-icon-document"></i>
-        老人管理
+        老人列表
       </el-menu-item>
     </el-submenu>
     <el-submenu index="3">
@@ -60,7 +64,7 @@
         <i class="el-icon-setting"></i>
         <span>监控管理</span>
       </template>
-      <el-menu-item index="/admin/monitorinfo">
+      <el-menu-item index="/admin/whitelist">
         <i class="el-icon-document-checked"></i>
         监控信息
       </el-menu-item>
