@@ -48,6 +48,12 @@
             style="width: 1200px"
             :row-class-name="tableRowClassName">
             <el-table-column
+              prop="id"
+              label="ID"
+              width="100"
+              align="center">
+            </el-table-column>
+            <el-table-column
               prop="date"
               label="日期"
               width="200"
@@ -88,7 +94,7 @@
             <el-table-column
               prop="area"
               label="报警区域"
-              width="150"
+              width="100"
               align="center">
             </el-table-column>
             <el-table-column
@@ -208,14 +214,13 @@ export default {
     },
     handleClick (row) {
       this.detailVisible = true
-      let date = row.date
-      let time = row.time
+      let id = row.id
       let formData = new FormData()
-      formData.append('date', date)
-      formData.append('time', time)
+      formData.append('id', id)
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
-      axios.post('http://127.0.0.1:8000/api/attacklistuser/detail', formData, {'headers': header}).then(response => {
+      // http://127.0.0.1:8000/api/emolistuser/detail http://127.0.0.1:8000/api/attacklistuser/detail
+      axios.post('http://47.106.148.74:8080/api/event/attack/detail', formData, {'headers': header}).then(response => {
         console.log(response.data)
         this.imgs = response.data
       })
