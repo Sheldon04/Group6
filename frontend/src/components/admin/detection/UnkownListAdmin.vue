@@ -48,9 +48,15 @@
             style="width: 1200px"
             :row-class-name="tableRowClassName">
             <el-table-column
+              prop="id"
+              label="ID"
+              width="100"
+              align="center">
+            </el-table-column>
+            <el-table-column
               prop="date"
               label="日期"
-              width="250"
+              width="200"
               align="center">
               <template slot-scope="scope">
                 <el-icon name="date"></el-icon>
@@ -60,7 +66,7 @@
             <el-table-column
               prop="time"
               label="时间"
-              width="250"
+              width="200"
               align="center">
               <template slot-scope="scope">
                 <el-icon name="time"></el-icon>
@@ -216,15 +222,13 @@ export default {
     },
     handleClick (row) {
       this.detailVisible = true
-      let date = row.date
-      let time = row.time
+      let id = row.id
       let formData = new FormData()
-      formData.append('date', date)
-      formData.append('time', time)
+      formData.append('id', id)
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
-      // 接口:http://127.0.0.1:8000/api/unknownList/detail  http://127.0.0.1:8000/api/attacklistuser/detail
-      axios.post('http://127.0.0.1:8000/api/unknownList/detail', formData, {'headers': header}).then(response => {
+      // http://127.0.0.1:8000/api/emolistuser/detail http://127.0.0.1:8000/api/attacklistuser/detail
+      axios.post('http://47.106.148.74:8080/api/event/unkown/detail', formData, {'headers': header}).then(response => {
         console.log(response.data)
         this.imgs = response.data
       })

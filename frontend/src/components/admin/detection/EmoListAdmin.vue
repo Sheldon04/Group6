@@ -48,6 +48,12 @@
             style="width: 1400px"
             :row-class-name="tableRowClassName">
             <el-table-column
+              prop="id"
+              label="ID"
+              width="100"
+              align="center">
+            </el-table-column>
+            <el-table-column
               prop="date"
               label="日期"
               width="200"
@@ -70,7 +76,7 @@
             <el-table-column
               prop="cid"
               label="摄像头"
-              width="100"
+              width="120"
               align="center">
             </el-table-column>
 <!--            <el-table-column-->
@@ -92,12 +98,6 @@
               align="center">
             </el-table-column>
             <el-table-column
-              prop="name"
-              label="老人姓名"
-              width="150"
-              align="center">
-            </el-table-column>
-            <el-table-column
               prop="emo"
               label="老人情绪"
               width="150"
@@ -105,7 +105,7 @@
             </el-table-column>
             <el-table-column
               label="操作"
-              width="100"
+              width="150"
               align="center">
               <template slot-scope="scope">
                 <el-button @click="handleClick(scope.row)" type="text" size="small">查看详情</el-button>
@@ -221,15 +221,13 @@ export default {
     },
     handleClick (row) {
       this.detailVisible = true
-      let date = row.date
-      let time = row.time
+      let id = row.id
       let formData = new FormData()
-      formData.append('date', date)
-      formData.append('time', time)
+      formData.append('id', id)
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
       // http://127.0.0.1:8000/api/emolistuser/detail http://127.0.0.1:8000/api/attacklistuser/detail
-      axios.post('http://127.0.0.1:8000/api/emolistuser/detail', formData, {'headers': header}).then(response => {
+      axios.post('http://47.106.148.74:8080/api/event/emo/detail', formData, {'headers': header}).then(response => {
         console.log(response.data)
         this.imgs = response.data
       })
