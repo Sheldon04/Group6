@@ -33,10 +33,10 @@
                   <div slot="reference" class="date_cell">
                     <el-badge v-if="parseInt(data.day.split('-')[1]) === cur_month" :value="month_invasion_data[parseInt(data.day.split('-')[2])]" class="item">
                       <el-tag v-if="parseInt(data.day.split('-')[1]) === cur_month && month_invasion_data[parseInt(data.day.split('-')[2])] > 0 && month_invasion_data[parseInt(data.day.split('-')[2])] <= 5" type="warning">
-                        有入侵
+                        有事件
                       </el-tag>
                       <el-tag v-if="parseInt(data.day.split('-')[1]) === cur_month && month_invasion_data[parseInt(data.day.split('-')[2])] > 5" type="danger">
-                        有入侵
+                        有事件
                       </el-tag>
                     </el-badge>
                   </div>

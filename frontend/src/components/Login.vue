@@ -349,7 +349,7 @@ export default {
       //   console.log('----------------------')
       // }
       this.user.is_superuser = '1'
-      axios.post('http://127.0.0.1:8000/api/user/login', this.user).then(response => {
+      axios.post('http://47.106.148.74:8080/api/user/login', this.user).then(response => {
         const {result, detail, errorInfo} = response.data
         if (result === true) {
           // 登录成功
