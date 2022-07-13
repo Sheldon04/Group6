@@ -119,3 +119,9 @@ class Volunteer(models.Model):
 class FaceLib(models.Model):
     idcard = models.CharField(max_length=64)
     img = models.ImageField(upload_to='faces', default='', storage=ImageStorage())
+
+class Camera(models.Model):
+    cid = models.IntegerField() # camera id
+    area = models.CharField(max_length= 50)
+    state = models.CharField(max_length= 10)
+    brand = models.CharField(max_length= 50)

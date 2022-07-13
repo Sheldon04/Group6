@@ -91,4 +91,8 @@ urlpatterns = [
     path('api/admin/getface', view.get_face), #获取人脸照片
     path('api/admin/updateface', view.update_face), #更新人脸照片
 
+    path('api/admin/delcamera', view.camera_delete), #删
+    path('api/admin/editcamera', view.camera_update), #改
+    path('api/admin/getallcamera', view.get_all_camera), #获取所有用户信息
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

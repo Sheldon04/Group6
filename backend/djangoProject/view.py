@@ -22,7 +22,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 
 from datamodel import models
 from datamodel.models import invationRecord, WhiteList, mypicture, mytask, segmentation, FallEvent, EmoEvent, \
-    InteractionEvent, UnkownEvent, AttackEvent, Older, FaceLib, Volunteer, Stuff
+    InteractionEvent, UnkownEvent, AttackEvent, Older, FaceLib, Volunteer, Stuff, Camera
 from djangoProject import settings
 
 from django.views.decorators.http import require_http_methods
@@ -245,7 +245,7 @@ def update_face(request):
     print(idcard)
     try:
         old = FaceLib.objects.filter(img=img).first()
-        del_path = './media/' + old.photo.name
+        del_path = './media/' + old.img.name
         os.remove(del_path)
     except:
         print('delete failed')
@@ -842,35 +842,32 @@ def get_specific_fall_records(request):
 
 
     list1 = FallEvent.objects.filter(date__range=(date_choose, date_choose))
-    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail")
+    list_ = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail", "id")
 
     response_data =json.dumps(
-        list(list.values("date", "time", "cid", "detail")), cls=DateEncoder)
+        list(list_.values("date", "time", "cid", "detail", "id")), cls=DateEncoder)
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['GET'])
 #获得全部摔倒记录
 def get_fall_records(request):
 
-    recordList = FallEvent.objects.values("date", "time", "cid", "detail")
-    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail")), cls=DateEncoder)
+    recordList = FallEvent.objects.values("date", "time", "cid", "detail", "id")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail", "id")), cls=DateEncoder)
 
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['POST'])
 def get_fall_detail(request):
-    date = request.POST.get("date")
-    time = request.POST.get("time")
-    time = time.split(':')
-    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
-    dirname = './media/screen_shots/' + datetime
-    print('dirname ', dirname)
-    # dirname = './monitor/video/2021-07-27-10-23-08'
-    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+
+    id = request.POST.get('id')
+    #phone = '222'
+    print(id)
+    qset = FallEvent.objects.filter(id=id)
+    print(qset.count())
+    mypic = qset.first()
     filename_list = []
-    for i in range(0, file_num):
-        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
-    print(filename_list)
+    filename_list.append('http://47.106.148.74:8080/media/' + mypic.img.name)
     return Response(filename_list)
 
 
@@ -889,35 +886,31 @@ def get_specific_emo_records(request):
 
 
     list1 = EmoEvent.objects.filter(date__range=(date_choose, date_choose))
-    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","oid","emo")
+    list_ = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","oid","emo", "id")
 
     response_data =json.dumps(
-        list(list.values("date", "time", "cid", "detail","oid","emo")), cls=DateEncoder)
+        list(list_.values("date", "time", "cid", "detail","oid","emo", "id")), cls=DateEncoder)
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['GET'])
 #获得全部情绪记录
 def get_emo_records(request):
 
-    recordList = EmoEvent.objects.values("date", "time", "cid", "detail","oid","emo")
-    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","oid","emo")), cls=DateEncoder)
+    recordList = EmoEvent.objects.values("date", "time", "cid", "detail","oid","emo", "id")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","oid","emo", "id")), cls=DateEncoder)
 
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['POST'])
 def get_emo_detail(request):
-    date = request.POST.get("date")
-    time = request.POST.get("time")
-    time = time.split(':')
-    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
-    dirname = './media/screen_shots/' + datetime
-    print('dirname ', dirname)
-    # dirname = './monitor/video/2021-07-27-10-23-08'
-    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    id = request.POST.get('id')
+    #phone = '222'
+    print(id)
+    qset = EmoEvent.objects.filter(id=id)
+    print(qset.count())
+    mypic = qset.first()
     filename_list = []
-    for i in range(0, file_num):
-        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
-    print(filename_list)
+    filename_list.append('http://47.106.148.74:8080/media/' + mypic.img.name)
     return Response(filename_list)
 
 
@@ -936,35 +929,31 @@ def get_specific_interaction_records(request):
 
 
     list1 = InteractionEvent.objects.filter(date__range=(date_choose, date_choose))
-    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","oid","vid")
+    list_ = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","oid","vid", "id")
 
     response_data =json.dumps(
-        list(list.values("date", "time", "cid", "detail","oid","vid")), cls=DateEncoder)
+        list(list_.values("date", "time", "cid", "detail","oid","vid", "id")), cls=DateEncoder)
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['GET'])
 #获得全部情绪记录
 def get_interaction_records(request):
 
-    recordList = InteractionEvent.objects.values("date", "time", "cid", "detail","oid","vid")
-    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","oid","vid")), cls=DateEncoder)
+    recordList = InteractionEvent.objects.values("date", "time", "cid", "detail","oid","vid", "id")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","oid","vid", "id")), cls=DateEncoder)
 
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['POST'])
 def get_interaction_detail(request):
-    date = request.POST.get("date")
-    time = request.POST.get("time")
-    time = time.split(':')
-    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
-    dirname = './media/screen_shots/' + datetime
-    print('dirname ', dirname)
-    # dirname = './monitor/video/2021-07-27-10-23-08'
-    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    id = request.POST.get('id')
+    #phone = '222'
+    print(id)
+    qset = InteractionEvent.objects.filter(id=id)
+    print(qset.count())
+    mypic = qset.first()
     filename_list = []
-    for i in range(0, file_num):
-        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
-    print(filename_list)
+    filename_list.append('http://47.106.148.74:8080/media/' + mypic.img.name)
     return Response(filename_list)
 
 
@@ -983,35 +972,31 @@ def get_specific_unkown_records(request):
 
 
     list1 = UnkownEvent.objects.filter(date__range=(date_choose, date_choose))
-    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","num")
+    list_ = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","num", "id")
 
     response_data =json.dumps(
-        list(list.values("date", "time", "cid", "detail","num")), cls=DateEncoder)
+        list(list_.values("date", "time", "cid", "detail","num", "id")), cls=DateEncoder)
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['GET'])
 #获得全部陌生人记录
 def get_unkown_records(request):
 
-    recordList = UnkownEvent.objects.values("date", "time", "cid", "detail","num")
-    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","num")), cls=DateEncoder)
+    recordList = UnkownEvent.objects.values("date", "time", "cid", "detail","num", "id")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","num", "id")), cls=DateEncoder)
 
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['POST'])
 def get_unkown_detail(request):
-    date = request.POST.get("date")
-    time = request.POST.get("time")
-    time = time.split(':')
-    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
-    dirname = './media/screen_shots/' + datetime
-    print('dirname ', dirname)
-    # dirname = './monitor/video/2021-07-27-10-23-08'
-    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    id = request.POST.get('id')
+    #phone = '222'
+    print(id)
+    qset = UnkownEvent.objects.filter(id=id)
+    print(qset.count())
+    mypic = qset.first()
     filename_list = []
-    for i in range(0, file_num):
-        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
-    print(filename_list)
+    filename_list.append('http://47.106.148.74:8080/media/' + mypic.img.name)
     return Response(filename_list)
 
 
@@ -1030,35 +1015,31 @@ def get_specific_attack_records(request):
 
 
     list1 = AttackEvent.objects.filter(date__range=(date_choose, date_choose))
-    list = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","personId","personType","area")
+    list_ = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","personId","personType","area", "id")
 
     response_data =json.dumps(
-        list(list.values("date", "time", "cid", "detail","personId","personType","area")), cls=DateEncoder)
+        list(list_.values("date", "time", "cid", "detail","personId","personType","area", "id")), cls=DateEncoder)
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['GET'])
 #获得全部闯入记录
 def get_attack_records(request):
 
-    recordList = AttackEvent.objects.values("date", "time", "cid", "detail","area","personId","personType","area")
-    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","personId","personType","area")), cls=DateEncoder)
+    recordList = AttackEvent.objects.values("date", "time", "cid", "detail","area","personId","personType","area", "id")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "detail","personId","personType","area", "id")), cls=DateEncoder)
 
     return JsonResponse(json.loads(response_data), safe=False)
 
 @api_view(['POST'])
 def get_attack_detail(request):
-    date = request.POST.get("date")
-    time = request.POST.get("time")
-    time = time.split(':')
-    datetime = date + '-' + time[0] + '-' + time[1] + '-' + time[2]
-    dirname = './media/screen_shots/' + datetime
-    print('dirname ', dirname)
-    # dirname = './monitor/video/2021-07-27-10-23-08'
-    file_num = sum([os.path.isfile(dirname + '/' + listx) for listx in os.listdir(dirname)])
+    id = request.POST.get('id')
+    #phone = '222'
+    print(id)
+    qset = AttackEvent.objects.filter(id=id)
+    print(qset.count())
+    mypic = qset.first()
     filename_list = []
-    for i in range(0, file_num):
-        filename_list.append('http://127.0.0.1:8000/media/screen_shots/' + datetime + '/' + str(i) + '.jpg')
-    print(filename_list)
+    filename_list.append('http://47.106.148.74:8080/media/' + mypic.img.name)
     return Response(filename_list)
 
 
@@ -1359,8 +1340,8 @@ def s_update(request):
 #获取所有用户信息
 @api_view(['GET'])
 def get_all_s(request):
-    sList = Stuff.objects.values("id", "name", "phone", "age", "idcard", "regdate")
-    response_data = json.dumps(list(sList.values("id", "name", "phone", "age", "idcard", "regdate")),
+    sList = Stuff.objects.values("id", "name", "phone", "age", "idcard", "regdate", "gender")
+    response_data = json.dumps(list(sList.values("id", "name", "phone", "age", "idcard", "regdate", "gender")),
                                cls=DateEncoder)
     return JsonResponse(json.loads(response_data), safe=False)
 
@@ -1444,7 +1425,58 @@ def v_update(request):
 #获取所有用户信息
 @api_view(['GET'])
 def get_all_v(request):
-    vList = Volunteer.objects.values("id", "name", "phone", "age", "idcard", "regdate")
-    response_data = json.dumps(list(vList.values("id", "name", "phone", "age", "idcard", "regdate")),
+    vList = Volunteer.objects.values("id", "name", "phone", "age", "idcard", "regdate", "gender")
+    response_data = json.dumps(list(vList.values("id", "name", "phone", "age", "idcard", "regdate", "gender")),
+                               cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+
+#删除用户
+@api_view(['POST'])
+def camera_delete(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    Camera.objects.filter(id=id).delete()
+
+    if(Stuff.objects.filter(id=id).delete()):
+        print("success")
+        result = True
+    else:
+        print('delede failed')
+        result = False
+        error_info = '删除失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#编辑用户
+@api_view(['POST'])
+def camera_update(request):
+    detail = {}
+    error_info=''
+    id = request.POST.get("id")
+    cid = request.POST.get("cid")
+    area = request.POST.get("area")
+    state = request.POST.get("state")
+    brand = request.POST.get("brand")
+
+    if(Camera.objects.filter(id=id).update(cid = cid,
+                                          area = area,
+                                          state = state,
+                                          brand = brand,)):
+        print("success")
+        result = True
+    else:
+        print('edit failed')
+        result = False
+        error_info = '编辑失败'
+
+    return JsonResponse({'result':result,'detail':detail,'errorInfo':error_info})
+
+#获取所有用户信息
+@api_view(['GET'])
+def get_all_camera(request):
+    sList = Camera.objects.values("id", "cid", "area", "state", "brand")
+    response_data = json.dumps(list(sList.values("id", "cid", "area", "state", "brand")),
                                cls=DateEncoder)
     return JsonResponse(json.loads(response_data), safe=False)
