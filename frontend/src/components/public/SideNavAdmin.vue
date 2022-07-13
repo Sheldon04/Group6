@@ -64,7 +64,7 @@
         <i class="el-icon-setting"></i>
         <span>监控管理</span>
       </template>
-      <el-menu-item index="/admin/whitelist">
+      <el-menu-item index="/admin/cameralist">
         <i class="el-icon-document-checked"></i>
         监控信息
       </el-menu-item>

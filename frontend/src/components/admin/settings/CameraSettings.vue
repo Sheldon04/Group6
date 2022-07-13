@@ -19,59 +19,34 @@
             <el-table-column
               prop="id"
               label="ID"
-              width="60"
-              align="center"
-              sortable>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="老人姓名"
-              width="150"
-              align="center"
-              sortable>
-            </el-table-column>
-            <el-table-column
-              prop="gender"
-              label="性别"
-              width="100"
-              align="center">
-            </el-table-column>
-            <el-table-column
-              prop="age"
-              label="年龄"
               width="100"
               align="center"
               sortable>
             </el-table-column>
             <el-table-column
-              prop="face_info"
-              label="人脸信息"
-              width="120"
-              align="center">
-              <template slot-scope="scope">
-                <el-button type="text" size="small" inline @click="handleFace(scope.$index, scope.row)">查看</el-button>
-                <el-button type="text" size="small" inline @click="handleFaceUploadOpen(scope.$index, scope.row)">更新</el-button>
-              </template>
-            </el-table-column>
-<!--            <el-table-column-->
-<!--              :formatter = "formatter"-->
-<!--              prop="is_superuser"-->
-<!--              label="是否为管理员"-->
-<!--              align="center"-->
-<!--              width="120"-->
-<!--              :filters="[{ text: '是', value: '是' }, { text: '否', value: '否' }]"-->
-<!--              :filter-method="filterHandler">-->
-<!--            </el-table-column>-->
-            <el-table-column
-              prop="room"
-              label="房间号"
-              align="center"
+              prop="cid"
+              label="监控编号"
               width="150"
+              align="center"
               sortable>
             </el-table-column>
             <el-table-column
-              prop="idcard"
-              label="身份证号"
+              prop="area"
+              label="区域"
+              width="100"
+              align="center"
+              sortable>
+            </el-table-column>
+            <el-table-column
+              prop="state"
+              label="状态"
+              width="100"
+              align="center"
+              sortable>
+            </el-table-column>
+            <el-table-column
+              prop="brand"
+              label="型号"
               align="center"
               width="200"
               sortable>
@@ -120,41 +95,17 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="editForm.id" auto-complete="off" disabled="true"></el-input>
           </el-form-item>
-          <el-form-item label="姓名" prop="name">
-            <el-input v-model="editForm.name" auto-complete="off"></el-input>
+          <el-form-item label="监控编号" prop="name">
+            <el-input v-model="editForm.cid" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="性别" prop="first_name">
-            <el-input v-model="editForm.gender" auto-complete="off"></el-input>
+          <el-form-item label="区域" prop="first_name">
+            <el-input v-model="editForm.area" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="年龄" prop="last_name">
-            <el-input v-model="editForm.age" auto-complete="off"></el-input>
+          <el-form-item label="状态" prop="last_name">
+            <el-input v-model="editForm.state" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="身份证号" prop="email">
-            <el-input v-model="editForm.idcard" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="房间号" prop="email">
-            <el-input v-model="editForm.room" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="手机号" prop="email">
-            <el-input v-model="editForm.phone" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="第一联系人姓名" prop="email">
-            <el-input v-model="editForm.r1name" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="第一联系人手机号" prop="email">
-            <el-input v-model="editForm.r1phone" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="第二联系人姓名" prop="email">
-            <el-input v-model="editForm.r2name" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="第二联系人手机号" prop="email">
-            <el-input v-model="editForm.r2phone" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="健康状态" prop="email">
-            <el-input v-model="editForm.health" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="注册日期" prop="email">
-            <el-input v-model="editForm.regdate" auto-complete="off" disabled="true"></el-input>
+          <el-form-item label="型号" prop="email">
+            <el-input v-model="editForm.brand" auto-complete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -195,7 +146,7 @@ import MyDropdown from '../../public/Dropdown'
 import MySidenavAdmin from '../../public/SideNavAdmin'
 import Banner from '../../public/Banner'
 export default {
-  name: 'OlderManage',
+  name: 'CameraSettings',
   components: {Banner, MySidenavAdmin, MyDropdown},
   computed: {
     headers () {
@@ -205,7 +156,7 @@ export default {
     }
   },
   mounted () {
-    const url = 'http://127.0.0.1:8000/api/admin/getallo'
+    const url = 'http://127.0.0.1:8000/api/admin/getallcamera'
     const auth = 'Token ' + localStorage.getItem('token')
     const header = {'Authorization': auth}
     axios.get(url, {'headers': header}).then(response => {
@@ -226,9 +177,8 @@ export default {
       editForm: {},
       editFormVisible: false,
       id_to_delete: '',
-      editURL: this.localAPI + 'admin/edito',
-      delURL: this.localAPI + 'admin/delo',
-      faceURL: this.localAPI + 'admin/getface',
+      editURL: this.localAPI + 'admin/editcamera',
+      delURL: this.localAPI + 'admin/delcamera',
       confirmDialogVisible: false,
       faceLoading: false,
       seeDialogVisible: false,
@@ -298,12 +248,6 @@ export default {
       formData.append('idcard', this.editForm.idcard)
       formData.append('gender', this.editForm.gender)
       formData.append('regdate', this.editForm.regdate)
-      formData.append('r1name', this.editForm.r1name)
-      formData.append('r1phone', this.editForm.r1phone)
-      formData.append('r2name', this.editForm.r2name)
-      formData.append('r2phone', this.editForm.r2phone)
-      formData.append('health', this.editForm.health)
-      formData.append('room', this.editForm.room)
       axios.post(this.editURL, formData, {'headers': this.headers}).then(res => {
         const {result, errorInfo} = res.data
         if (result === true) {
@@ -313,7 +257,7 @@ export default {
             type: 'success'
           })
           this.loading = true
-          axios.get('http://127.0.0.1:8000/api/admin/getallo', {'headers': this.headers}).then(response => {
+          axios.get('http://127.0.0.1:8000/api/admin/getalls', {'headers': this.headers}).then(response => {
             this.tableData = response.data
             this.loading = false
           })
@@ -345,7 +289,7 @@ export default {
             type: 'success'
           })
           this.loading = true
-          axios.get('http://127.0.0.1:8000/api/admin/getallo', {'headers': this.headers}).then(response => {
+          axios.get('http://127.0.0.1:8000/api/admin/getalls', {'headers': this.headers}).then(response => {
             this.tableData = response.data
             this.loading = false
           })

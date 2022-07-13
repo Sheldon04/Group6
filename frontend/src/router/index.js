@@ -23,6 +23,7 @@ import UnkownListAdmin from '../components/admin/detection/UnkownListAdmin'
 import VolunteerManage from '../components/admin/manage/VolunteerManage'
 import OlderManage from '../components/admin/manage/OlderManage'
 import AddPerson from '../components/admin/manage/AddPerson'
+import CameraSettings from '../components/admin/settings/CameraSettings'
 
 Vue.use(Router)
 
@@ -127,6 +128,11 @@ var router = new Router({
       path: '/admin/unkownlist',
       name: 'UnkownListAdmin',
       component: UnkownListAdmin
+    },
+    {
+      path: '/admin/cameralist',
+      name: 'CameraSettings',
+      component: CameraSettings
     },
     {
       path: '/user/deblur',

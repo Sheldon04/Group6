@@ -37,6 +37,13 @@ import axios from 'axios'
 import Banner from '../../public/Banner'
 export default {
   name: 'Segmentation',
+  computed: {
+    headers () {
+      return {
+        'Authorization': 'Token ' + localStorage.getItem('token')
+      }
+    }
+  },
   mounted () {
     // eslint-disable-next-line no-unused-vars,no-undef
     this.canvas = new fabric.Canvas('canvas')
