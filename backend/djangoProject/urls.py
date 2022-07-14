@@ -69,6 +69,9 @@ urlpatterns = [
     path('api/event/attack/all', view.get_attack_records), #所有闯入事件
     path('api/event/attack/detail', view.get_attack_detail), #闯入事件
     path('api/event/attack', view.get_specific_attack_records), #指定闯入事件
+    path('api/event/mask/all', view.get_mask_records), #所有口罩事件
+    path('api/event/mask/detail', view.get_mask_detail), #口罩事件
+    path('api/event/mask', view.get_specific_mask_records), #指定口罩事件
 
 
     path('api/admin/addo', view.o_reg), #增
@@ -94,5 +97,7 @@ urlpatterns = [
     path('api/admin/delcamera', view.camera_delete), #删
     path('api/admin/editcamera', view.camera_update), #改
     path('api/admin/getallcamera', view.get_all_camera), #获取所有用户信息
+
+    path('api/admin/getpersontype', view.get_person_type), #获取所有用户信息
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -22,7 +22,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 
 from datamodel import models
 from datamodel.models import invationRecord, WhiteList, mypicture, mytask, segmentation, FallEvent, EmoEvent, \
-    InteractionEvent, UnkownEvent, AttackEvent, Older, FaceLib, Volunteer, Stuff, Camera
+    InteractionEvent, UnkownEvent, AttackEvent, Older, FaceLib, Volunteer, Stuff, Camera, MaskEvent
 from djangoProject import settings
 
 from django.views.decorators.http import require_http_methods
@@ -1044,6 +1044,48 @@ def get_attack_detail(request):
 
 
 
+@api_view(['POST'])
+#获取某一天某段时间内的口罩记录
+def get_specific_mask_records(request):
+    date_choose_str= request.POST.get('date')
+    time_span_str=request.POST.get('time_span')
+
+    date_choose =datetime.datetime.strptime(date_choose_str,"%Y-%m-%d")
+    time_str_list=time_span_str.split(',')
+    time_from_str=time_str_list[0]
+    time_to_str=time_str_list[1]
+    time_from=datetime.datetime.strptime(time_from_str,'%H:%M:%S')
+    time_to = datetime.datetime.strptime(time_to_str, '%H:%M:%S')
+
+
+    list1 = MaskEvent.objects.filter(date__range=(date_choose, date_choose))
+    list_ = list1.filter(time__range=(time_from,time_to)).values("date", "time", "cid", "detail","personId","personType","area", "id")
+
+    response_data =json.dumps(
+        list(list_.values("date", "time", "cid", "detail","personId","personType","area", "id")), cls=DateEncoder)
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['GET'])
+#获得全部口罩记录
+def get_mask_records(request):
+
+    recordList = MaskEvent.objects.values("date", "time", "cid", "hasmask", "id", "detail")
+    response_data = json.dumps(list(recordList.values("date", "time", "cid", "hasmask", "id", "detail")), cls=DateEncoder)
+
+    return JsonResponse(json.loads(response_data), safe=False)
+
+@api_view(['POST'])
+def get_mask_detail(request):
+    id = request.POST.get('id')
+    #phone = '222'
+    print(id)
+    qset = MaskEvent.objects.filter(id=id)
+    print(qset.count())
+    mypic = qset.first()
+    filename_list = []
+    filename_list.append('http://47.106.148.74:8080/media/' + mypic.img.name)
+    return Response(filename_list)
+
 #增加用户
 @api_view(['POST'])
 def o_reg(request):
@@ -1480,3 +1522,31 @@ def get_all_camera(request):
     response_data = json.dumps(list(sList.values("id", "cid", "area", "state", "brand")),
                                cls=DateEncoder)
     return JsonResponse(json.loads(response_data), safe=False)
+
+
+@api_view(['POST'])
+#获取人物信息
+def get_person_type(request):
+    personType = ''
+    error_info=''
+    idcard = request.POST.get("idcard")
+
+    len1 = len(Older.objects.filter(idcard=idcard).get(idcard = idcard))
+    len2 = len(Stuff.objects.filter(idcard=idcard).get(idcard = idcard))
+    len3 = len(Volunteer.objects.filter(idcard=idcard).get(idcard = idcard))
+    if(len1 != 0):
+        print("Older Type")
+        result = True
+        personType = '老人'
+    elif(len2 != 0):
+        print("Stuff Type")
+        result = True
+        personType = '工作人员'
+    elif(len3 != 0):
+        print("Volunteer Type")
+        result = True
+        personType = '义工'
+    else:
+        result = False
+
+    return JsonResponse({'result':result,'personType':personType,'errorInfo':error_info})

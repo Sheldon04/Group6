@@ -73,6 +73,14 @@ class UnkownEvent(models.Model):
     detail = models.CharField(max_length= 200)
     img = models.ImageField(upload_to='unkowns', default='', storage=ImageStorage())
 
+class MaskEvent(models.Model):
+    cid = models.IntegerField() # camera id
+    date = models.DateField()
+    time = models.TimeField()
+    hasmask = models.CharField(max_length=5)
+    detail = models.CharField(max_length= 200)
+    img = models.ImageField(upload_to='masks', default='', storage=ImageStorage())
+
 class AttackEvent(models.Model):
     cid = models.IntegerField() # camera id
     personType = models.CharField(max_length= 20)
