@@ -24,6 +24,7 @@ import VolunteerManage from '../components/admin/manage/VolunteerManage'
 import OlderManage from '../components/admin/manage/OlderManage'
 import AddPerson from '../components/admin/manage/AddPerson'
 import CameraSettings from '../components/admin/settings/CameraSettings'
+import MaskListAdmin from '../components/admin/detection/MaskListAdmin'
 
 Vue.use(Router)
 
@@ -133,6 +134,11 @@ var router = new Router({
       path: '/admin/cameralist',
       name: 'CameraSettings',
       component: CameraSettings
+    },
+    {
+      path: '/admin/masklist',
+      name: 'MaskListAdmin',
+      component: MaskListAdmin
     },
     {
       path: '/user/deblur',

@@ -3,7 +3,7 @@
   <div>
   <h1>Welcome</h1>
     <div class="background">
-      <span>WatchDogs</span>
+      <span>WatchOlds</span>
     </div>
     <div>
       <footer id="footer" style="width: 100%; height: 150px">

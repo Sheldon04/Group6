@@ -73,18 +73,12 @@
                 <span style="margin-left: 10px">{{ scope.row.time }}</span>
               </template>
             </el-table-column>
-            <el-table-column
-              prop="personType"
-              label="人员类型"
-              width="150"
-              align="center">
-            </el-table-column>
-            <el-table-column
-              prop="personId"
-              label="人员ID"
-              width="150"
-              align="center">
-            </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="level"-->
+<!--              label=""-->
+<!--              width="150"-->
+<!--              align="center">-->
+<!--            </el-table-column>-->
             <el-table-column
               prop="cid"
               label="摄像头"
@@ -92,13 +86,25 @@
               align="center">
             </el-table-column>
             <el-table-column
-              prop="area"
-              label="报警区域"
-              width="100"
+              prop="hasmask"
+              label="是否佩戴"
+              width="150"
               align="center">
             </el-table-column>
             <el-table-column
-              fixed="right"
+              prop="detail"
+              label="详情"
+              width="250"
+              align="center">
+            </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="invation_num"-->
+<!--              label=""-->
+<!--              width="150"-->
+<!--              align="center">-->
+<!--            </el-table-column>-->
+<!--            fixed="right"-->
+            <el-table-column
               label="操作"
               width="100"
               align="center">
@@ -118,7 +124,7 @@
       </el-container>
       <el-dialog
         @close="detailClose"
-        title="闯入详情"
+        title="口罩详情"
         :visible.sync="detailVisible"
         center
         class="detail-dialog">
@@ -167,12 +173,13 @@ import MyDropdown from '../../public/Dropdown'
 import Banner from '../../public/Banner'
 import MySidenavAdmin from '../../public/SideNavAdmin'
 export default {
-  name: 'AttackListAdmin',
+  name: 'MaskListAdmin',
   components: {MySidenavAdmin, Banner, MyDropdown},
   mounted () {
     const auth = 'Token ' + localStorage.getItem('token')
     const header = {'Authorization': auth}
-    axios.get('http://127.0.0.1:8000/api/event/attack/all', {'headers': header}).then(response => {
+    //     // 接口：http://127.0.0.1:8000/api/unknownList/all  http://127.0.0.1:8000/api/attacklistuser/all
+    axios.get('http://127.0.0.1:8000/api/event/mask/all', {'headers': header}).then(response => {
       this.tableData = response.data
       this.loading = false
     })
@@ -189,7 +196,8 @@ export default {
       formData.append('time_span', this.timespan) // 8:00:15,9:00:00
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
-      axios.post('http://127.0.0.1:8000/api/event/attack', formData, {'headers': header}).then(response => {
+      // 接口：http://127.0.0.1:8000/api/unknownList  http://127.0.0.1:8000/api/attacklistuser
+      axios.post('http://127.0.0.1:8000/api/event/mask', formData, {'headers': header}).then(response => {
         this.tableData = response.data
       })
       console.log(formData.get('date'))
@@ -220,7 +228,7 @@ export default {
       const auth = 'Token ' + localStorage.getItem('token')
       const header = {'Authorization': auth}
       // http://127.0.0.1:8000/api/emolistuser/detail http://127.0.0.1:8000/api/attacklistuser/detail
-      axios.post('http://47.106.148.74:8080/api/event/attack/detail', formData, {'headers': header}).then(response => {
+      axios.post('http://47.106.148.74:8080/api/event/mask/detail', formData, {'headers': header}).then(response => {
         console.log(response.data)
         this.imgs = response.data
       })
@@ -236,9 +244,9 @@ export default {
       currentPage: 1, // 当前页码
       total: 0, // 总条数
       pageSize: 10, // 每页的数据条数
-      imgSrc: require('../../../assets/img3.jpg'),
+      imgSrc: require('../../../assets/img3.jpg'), // watch dogs
       options: [],
-      date: '2021-7-21',
+      date: '2022-07-01',
       timespan: ['00:00:00', '23:59:59'],
       tableData: [],
       detailVisible: false,

@@ -36,6 +36,10 @@
         <i class="el-icon-document"></i>
         陌生人记录
       </el-menu-item>
+      <el-menu-item index="/admin/masklist">
+        <i class="el-icon-document"></i>
+        口罩记录
+      </el-menu-item>
     </el-submenu>
     <el-submenu index="2">
       <template slot="title">
